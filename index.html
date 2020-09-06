@@ -1,11 +1,27 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)https://gabecisneros.github.io/Hackathon2/index.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  
-  <link rel="stylesheet" type="text/css" href="./index_files/styley.css">
-  <title>Coronavirus distance or not</title>
-  <style>
-      body {background-color: black;}
+<title>Coronavirus distance or not</title>
+<style>
+
+body {
+  background-color: black;
+}
+
+.h1title {
+  width: 100%;
+  margin: 0 auto 30px;
+  color: #2a2a2a;
+  font-family: 'PostoniWide','Bodoni 72','Bodoni MT',Didot,'Didot LT STD','Hoefler Text',Garamond,Georgia,serif;
+  line-height: 0.9em;
+  max-width: 100vw;
+  text-transform: uppercase;
+  font-size: 6vw !important;
+  text-align: center;
+  padding: 150px 0 100px 0;
+  top: 50%;
+  left: 40%;
+}
+
 .button {
   background-color: #4CAF50; /* Green */
   border: none;
@@ -19,23 +35,44 @@
   top: 10%;
   left: 40%;
 }
+
 .img {
-    position: absolute;
-    top: 30%;
-    left: 25%;
+  position: absolute;
+  top: 30%;
+  left: 25%;
 }
+
+.bottomleft {
+  position: absolute;
+  bottom: 0px;
+  left: 16px;
+  font-size: 18px;
+}
+
+.bottomright {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  font-size: 18px;
+}
+
 </style>
 
 <script>
     function openWin() {
       window.open("socialdistancemap.html");
     }
+
+    function openWinCDC() {
+      window.open("https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html");
+    }
     </script>
 
 </head>
 <body>
-  <button class="button" type="button" href="getcounty.html" onclick="openWin()">Should I social distance ?</button>
-  <img class="img" src="./img/social-distance.jpg">
-
-
-</body></html>
+  <h1 class="h1title" style="color: #FFFFFF;" onclick="openWin()">Should I social distance ?</h1>
+</div>
+<img class="bottomleft" src="https://boch9401.github.io/CovidHax/img/NOVA_decoding_covid19_lead_t800.jpg">
+<img class="bottomright" src="https://boch9401.github.io/CovidHax/img/slowthespread.png" onclick="openWinCDC()">
+</body>
+</html>
