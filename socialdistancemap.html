@@ -60,37 +60,35 @@
                 }); 
                 country = filtered_array.length ? filtered_array[0].long_name: "";
                
-                const result = countyData.message.find(findCounty);
-              
-              console.log(country);
+                if (countyData) {
+                    const result = countyData.message.find(findCounty);
+                
+                    if (result) {
+                
+                        if (country == 'United States') {
+                            cMsg = "<center><b>" + county + " County</b><br/>" + 
+                                "<a target='_blank' href='https://www.worldometers.info/coronavirus/usa/" + state + "''>" + state + "</a>" +
+                                "<br><br> Total Cases: <b>" + 
+                                numberWithCommas(result.confirmed) + "</b> " + 
+                                "<br> Deaths: <b>" + numberWithCommas(result.death) + "</b><br>"
 
-console.log(result);
-                if (result) {
-               
-                    if (country == 'United States') {
+                            if (result.confirmed > 1000) 
+                                cMsg += "</br>" +
+                            "<img src='https://quincy-network.s3.ca-central-1.amazonaws.com/wp-content/uploads/sites/10/2020/04/coronavirus-social-distancing.jpg' width=100>" +
+                                "<br><br><b><font color='red'>You should be social distancing <br> and wearing a mask !</font></b>";
+                            else
+                                cMsg += "</br>" +
+                                "<img src='https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/thumbs-up.png' width=35>" +
+                                "<br><br><b><font color='green'>Great job, you don't need to social distance</font></b>";
+                        }
+                    }
+                    else
+                    {
                         cMsg = "<center><b>" + county + " County</b><br/>" + 
-                               "<a target='_blank' href='https://www.worldometers.info/coronavirus/usa/" + state + "''>" + state + "</a>" +
-                               "<br><br> Total Cases: <b>" + 
-                               numberWithCommas(result.confirmed) + "</b> " + 
-                               "<br> Deaths: <b>" + numberWithCommas(result.death) + "</b><br>"
-
-                        if (result.confirmed > 1000) 
-                            cMsg += "</br>" +
-                           "<img src='./img/coronavirus-social-distancing.jpg' width=100>" +
-                            "<br><br><b><font color='red'>You should be social distancing <br> and wearing a mask !</font></b>";
-                        else
-                            cMsg += "</br>" +
-                            "<img src='./img/thumbs-up.png' width=35>" +
-                            "<br><br><b><font color='green'>Great job, you don't need to social distance</font></b>";
+                            "<a target='_blank' href='https://www.worldometers.info/coronavirus/country/" + country + "/''>" + country + "</a>" +
+                            "<br><br>No coronvirus data available<b>"
                     }
                 }
-                else
-                {
-                    cMsg = "<center><b>" + county + " County</b><br/>" + 
-                           "<a target='_blank' href='https://www.worldometers.info/coronavirus/country/" + country + "/''>" + country + "</a>" +
-                           "<br><br>No coronvirus data available<b>"
-                }
-                
             }
         } else cMsg = '';
         })
@@ -124,7 +122,7 @@ console.log(result);
           zoom: 6
         });
 
-        infoWindow = new google.maps.InfoWindow(); // Try HTML5 geolocation.
+        infoWindow = new google.maps.InfoWindow();
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -191,10 +189,12 @@ console.log(result);
             
             });
             
+            /*
             infoWindow.setContent("Gathering data...");
-
             infoWindow.setPosition(currentPos);
             infoWindow.open(map);
+            */
+
             map.setCenter(currentPos);
             
             },
