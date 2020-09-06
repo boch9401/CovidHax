@@ -189,11 +189,14 @@
             
             });
             
-            /*
-            infoWindow.setContent("Gathering data...");
-            infoWindow.setPosition(currentPos);
-            infoWindow.open(map);
-            */
+           setTimeout(() => { 
+                      if (cMsg != ""){ 
+                        infoWindow.setContent(cMsg)
+                        infoWindow.setPosition(currentPos)
+                        infoWindow.open(map)
+                        map.setCenter(currentPos);
+                      }
+                  }, 500);
 
             map.setCenter(currentPos);
             
