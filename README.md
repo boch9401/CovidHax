@@ -1,6 +1,6 @@
 # Covid Hacks Submission
 
-![alt text](img/index.png)
+![alt text](https://boch9401.github.io/CovidHax/img/index.png)
 
 This web application helps you decide if you need to socially distance
 
