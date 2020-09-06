@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Social Distance Map</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+    <style type="text/css">
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+
+    <script>
+      "use strict";
+
+      // Note: This example requires that you consent to location sharing when
+      // prompted by your browser. If you see the error "The Geolocation service
+      // failed.", it means you probably did not give permission for the browser to
+      // locate you.
+      let map, infoWindow, countyData, county, state, country, cMsg;
+
+      loadPage();
+
+      function loadPage() {
+        getCountyData();
+      }
+      
+      async function getLocationData(pos){
+        var geocoder = new google.maps.Geocoder;
+
+        cMsg = '';
+        
+        await geocoder.geocode({'location': pos}, function(results, status) {
+        if (status === 'OK') {
+            if (results[0]) {
+                
+                var filtered_array = results[0].address_components.filter(function(address_component){
+                  return address_component.types.includes("administrative_area_level_2");
+                }); 
+                county = filtered_array.length ? filtered_array[0].long_name: "";
+                county = county.replace("County", "").trim();
+               
+                filtered_array = results[0].address_components.filter(function(address_component){
+                  return address_component.types.includes("administrative_area_level_1");
+                }); 
+                state = filtered_array.length ? filtered_array[0].long_name: "";
+
+                filtered_array = results[0].address_components.filter(function(address_component){
+                  return address_component.types.includes("country");
+                }); 
+                country = filtered_array.length ? filtered_array[0].long_name: "";
+               
+                const result = countyData.message.find(findCounty);
+              
+              console.log(country);
+
+console.log(result);
+                if (result) {
+               
+                    if (country == 'United States') {
+                        cMsg = "<center><b>" + county + " County</b><br/>" + 
+                               "<a target='_blank' href='https://www.worldometers.info/coronavirus/usa/" + state + "''>" + state + "</a>" +
+                               "<br><br> Total Cases: <b>" + 
+                               numberWithCommas(result.confirmed) + "</b> " + 
+                               "<br> Deaths: <b>" + numberWithCommas(result.death) + "</b><br>"
+
+                        if (result.confirmed > 1000) 
+                            cMsg += "</br>" +
+                           "<img src='https://quincy-network.s3.ca-central-1.amazonaws.com/wp-content/uploads/sites/10/2020/04/coronavirus-social-distancing.jpg' width=100>" +
+                            "<br><br><b><font color='red'>You should be social distancing <br> and wearing a mask !</font></b>";
+                        else
+                            cMsg += "</br>" +
+                            "<img src='https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/thumbs-up.png' width=35>" +
+                            "<br><br><b><font color='green'>Great job, you don't need to social distance</font></b>";
+                    }
+                }
+                else
+                {
+                    cMsg = "<center><b>" + county + " County</b><br/>" + 
+                           "<a target='_blank' href='https://www.worldometers.info/coronavirus/country/" + country + "/''>" + country + "</a>" +
+                           "<br><br>No coronvirus data available<b>"
+                }
+                
+            }
+        } else cMsg = '';
+        })
+      }
+
+      async function getCountyData() {
+        const res = await fetch ("https://covid19-us-api.herokuapp.com/county");
+        countyData = await res.json();
+      }
+
+      function loadCountyData () {
+         countyData = JSON.parse(this.responseText);
+      }
+
+      function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+
+      function findCounty(countyEntry){
+                   return countyEntry.county_name.toUpperCase() === county.toUpperCase() &&
+                          countyEntry.state_name.toUpperCase() === state.toUpperCase()
+              }
+
+      function initMap() {
+
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: {
+            lat: 34.052235,
+            lng: -118.243683
+          },
+          zoom: 6
+        });
+
+        infoWindow = new google.maps.InfoWindow(); // Try HTML5 geolocation.
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const currentPos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                };
+            
+            var geocoder = new google.maps.Geocoder;
+
+            geocoder.geocode({'location': currentPos}, function(results, status) {
+            if (status === 'OK') {
+              if (results[0]) {
+                
+                getLocationData(currentPos);
+
+                setTimeout(() => { 
+                      if (cMsg != ""){ 
+                        infoWindow.setContent(cMsg)
+                        infoWindow.setPosition(currentPos)
+                        infoWindow.open(map)
+                        map.setCenter(currentPos);
+                      }
+                  }, 500);
+
+              
+                // Configure the click listener.
+                map.addListener('click', function(mapsMouseEvent) {
+
+                // Close the current InfoWindow.
+                infoWindow.close();
+
+                // Create a new InfoWindow.
+                infoWindow = new google.maps.InfoWindow({position: mapsMouseEvent.latLng});
+                infoWindow.setContent(mapsMouseEvent.latLng.toString());
+              
+                const clickPos = {
+                            lat: mapsMouseEvent.latLng.lat(),
+                            lng: mapsMouseEvent.latLng.lng()
+                  }
+                  
+                getLocationData(clickPos);
+
+                setTimeout(() => { 
+                      if (cMsg != ""){ 
+                        infoWindow.setContent(cMsg)
+                        infoWindow.setPosition(clickPos)
+                        infoWindow.open(map)
+                      }
+                  }, 500);
+
+
+                });
+
+                
+              } else {
+                window.alert('No results found');
+                }
+            
+            } else {
+                cMsg = '';
+                }
+            
+            });
+            
+            infoWindow.setContent("Gathering data...");
+
+            infoWindow.setPosition(currentPos);
+            infoWindow.open(map);
+            map.setCenter(currentPos);
+            
+            },
+            () => {
+              handleLocationError(true, infoWindow, map.getCenter());
+            }
+          );
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+      }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ? "Error: The Geolocation service failed." : "Error: Your browser doesn't support geolocation.");
+        infoWindow.open(map);
+      }
+    </script>
+
+    <script
+         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDrIlosSUgX3LrOiMDHos7ZOdtmDI8Abjk&callback=initMap&libraries=&v=weekly" defer>
+    </script>
+
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+</html>
